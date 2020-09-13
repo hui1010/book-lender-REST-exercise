@@ -20,12 +20,6 @@ public class BookServiceImpl implements BookService{
         this.bookRepository = bookRepository;
     }
 
-    @Override
-    public List<BookDto> findByReserved(boolean reserved) {
-        List<Book> foundItems = bookRepository.findAllByReserved(reserved);
-        return getBookDtos(foundItems);
-    }
-
     /**
      * convert List<Book> to List<BookDto>
      * */
@@ -52,6 +46,11 @@ public class BookServiceImpl implements BookService{
         return bookDto;
     }
 
+    @Override
+    public List<BookDto> findByReserved(boolean reserved) {
+        List<Book> foundItems = bookRepository.findAllByReserved(reserved);
+        return getBookDtos(foundItems);
+    }
     @Override
     public List<BookDto> findByAvailable(boolean available) {
         List<Book> foundItems = bookRepository.findAllByAvailable(available);
