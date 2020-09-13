@@ -7,7 +7,7 @@ import java.util.List;
 public interface BookService {
     List<BookDto> findByReserved(boolean reserved);
     List<BookDto> findByAvailable(boolean available);
-    List<BookDto> findByTitle();
+    List<BookDto> findByTitle(String title);
     BookDto findById(int bookId);
     List<BookDto> findAll();
     BookDto create(BookDto bookDto);
