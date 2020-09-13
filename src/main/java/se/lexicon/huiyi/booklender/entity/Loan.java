@@ -63,8 +63,8 @@ public class Loan {
         return isTerminated;
     }
 
-    public void setTerminated(boolean isTerminated) {
-        this.isTerminated = isTerminated;
+    public void setTerminated(boolean terminated) {
+        isTerminated = terminated;
     }
 
     @Override
