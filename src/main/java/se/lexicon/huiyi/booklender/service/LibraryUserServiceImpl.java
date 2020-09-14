@@ -22,7 +22,7 @@ public class LibraryUserServiceImpl implements LibraryUserService {
     /**
      * convert LibraryUser to LibraryUserDto
      * */
-    private static LibraryUserDto getLibraryUserDto(LibraryUser libraryUser) {
+    protected static LibraryUserDto getLibraryUserDto(LibraryUser libraryUser) {
         LibraryUserDto libraryUserDto = new LibraryUserDto();
         libraryUserDto.setUserId(libraryUser.getUserId());
         libraryUserDto.setRegDate(libraryUser.getRegDate());
@@ -34,13 +34,25 @@ public class LibraryUserServiceImpl implements LibraryUserService {
     /**
      * convert List<LibraryUser> to List<LibraryUserDto>
      * */
-    private static List<LibraryUserDto> getLibraryUserDtos(List<LibraryUser> foundItems) {
+    protected static List<LibraryUserDto> getLibraryUserDtos(List<LibraryUser> foundItems) {
         List<LibraryUserDto> results = new ArrayList<>();
         for (LibraryUser l : foundItems){
             LibraryUserDto libraryUserDto = getLibraryUserDto(l);
             results.add(libraryUserDto);
         } return results;
     }
+
+    /**
+     * convert LibraryUserDto to LibraryUser
+     * */
+    protected static LibraryUser getLibraryUser(LibraryUserDto libraryUserDto){
+        LibraryUser libraryUser = new LibraryUser(
+                libraryUserDto.getRegDate(), libraryUserDto.getName(), libraryUserDto.getEmail()
+        );
+        return libraryUser;
+    }
+
+
     @Override
     public LibraryUserDto findById(int userId) {
         LibraryUser libraryUser = libraryUserRepository.findById(userId).get();
@@ -78,7 +90,7 @@ public class LibraryUserServiceImpl implements LibraryUserService {
             user.setName(libraryUserDto.getName());
         if (!user.getEmail().equalsIgnoreCase(libraryUserDto.getEmail()))
             user.setEmail(libraryUserDto.getEmail());
-        return getLibraryUserDto(user);
+        return getLibraryUserDto(libraryUserRepository.save(user));
     }
 
     @Override

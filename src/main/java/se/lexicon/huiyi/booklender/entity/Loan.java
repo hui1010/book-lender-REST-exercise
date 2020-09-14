@@ -31,14 +31,14 @@ public class Loan {
         this.loanDate = loanDate;
         this.isTerminated = isTerminated;
     }
-    //todo test
+
     public boolean isOverdue(){
         boolean isOverdue = false;
         if (LocalDate.now().isAfter(this.loanDate.plusDays(book.getMaxLoanDays())))
             isOverdue = true;
         return isOverdue;
     }
-    //todo test
+
     public boolean extendLoan(int days){
         boolean isExtended = false;
         if (!book.isReserved() && days == book.getMaxLoanDays()){
