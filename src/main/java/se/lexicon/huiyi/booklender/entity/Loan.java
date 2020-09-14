@@ -2,6 +2,7 @@ package se.lexicon.huiyi.booklender.entity;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAmount;
 import java.util.Objects;
 
 @Entity
@@ -29,6 +30,22 @@ public class Loan {
         this.book = book;
         this.loanDate = loanDate;
         this.isTerminated = isTerminated;
+    }
+    //todo test
+    public boolean isOverdue(){
+        boolean isOverdue = false;
+        if (LocalDate.now().isAfter(this.loanDate.plusDays(book.getMaxLoanDays())))
+            isOverdue = true;
+        return isOverdue;
+    }
+    //todo test
+    public boolean extendLoan(int days){
+        boolean isExtended = false;
+        if (!book.isReserved() && days == book.getMaxLoanDays()){
+            book.setMaxLoanDays(book.getMaxLoanDays() + days);
+            isExtended = true;
+        }
+        return isExtended;
     }
 
     public long getLoanId() {

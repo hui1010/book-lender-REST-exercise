@@ -34,6 +34,22 @@ class LoanTest {
     }
 
     @Test
+    void isOverdue() {
+        assertTrue(testObject.isOverdue());
+    }
+
+    @Test
+    void extendLoan() {
+        book1.setReserved(true);
+        assertFalse(testObject.extendLoan(30));
+        assertFalse(testObject.extendLoan(40));
+
+        book1.setReserved(false);
+        assertTrue(testObject.extendLoan(30));
+        assertEquals(60, testObject.getBook().getMaxLoanDays());
+    }
+
+    @Test
     void getLoanId() {
         assertEquals(0,testObject.getLoanId());
     }
