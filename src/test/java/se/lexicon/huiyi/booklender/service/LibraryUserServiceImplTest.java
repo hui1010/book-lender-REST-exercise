@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class LibraryUserServiceImplTest {
 
     LibraryUserServiceImpl testObject;
-    LibraryUserDto userDto1 = new LibraryUserDto();
-    LibraryUserDto userDto2 = new LibraryUserDto();
+    LibraryUserDto userDto1;
+    LibraryUserDto userDto2;
 
     LibraryUser user1;
     LibraryUser user2;
@@ -65,6 +65,8 @@ class LibraryUserServiceImplTest {
     @Test
     void findAll() {
         assertEquals(2, testObject.findAll().size());
+        assertTrue(testObject.findAll().contains(userDto1));
+        assertTrue(testObject.findAll().contains(userDto2));
     }
 
     @Test

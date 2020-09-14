@@ -107,7 +107,7 @@ public class BookServiceImpl implements BookService{
             toUpdated.setReserved(bookDto.isReserved());
         if (toUpdated.getMaxLoanDays()!= bookDto.getMaxLoanDays())
             toUpdated.setMaxLoanDays(bookDto.getMaxLoanDays());
-        if (toUpdated.getFinePerDay() != bookDto.getFinePerDay())
+        if (!toUpdated.getFinePerDay().equals(bookDto.getFinePerDay()))
             toUpdated.setFinePerDay(bookDto.getFinePerDay());
         if (!toUpdated.getDescription().equals(bookDto.getDescription()))
             toUpdated.setDescription(bookDto.getDescription());
