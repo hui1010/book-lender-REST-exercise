@@ -9,5 +9,6 @@ public interface LibraryUserRepository extends CrudRepository<LibraryUser, Integ
     List<LibraryUser> findAll();
 
     LibraryUser findByEmailIgnoreCase(String email);
+    LibraryUser findByUserId(int userId);
 
 }

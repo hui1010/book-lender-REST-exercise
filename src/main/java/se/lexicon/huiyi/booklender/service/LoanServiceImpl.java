@@ -2,8 +2,12 @@ package se.lexicon.huiyi.booklender.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import se.lexicon.huiyi.booklender.data.BookRepository;
+import se.lexicon.huiyi.booklender.data.LibraryUserRepository;
 import se.lexicon.huiyi.booklender.data.LoanRepository;
+import se.lexicon.huiyi.booklender.dto.LibraryUserDto;
 import se.lexicon.huiyi.booklender.dto.LoanDto;
+import se.lexicon.huiyi.booklender.entity.LibraryUser;
 import se.lexicon.huiyi.booklender.entity.Loan;
 
 import java.util.ArrayList;
@@ -13,29 +17,38 @@ import java.util.List;
 public class LoanServiceImpl implements LoanService {
 
     LoanRepository loanRepository;
+    BookRepository bookRepository;
+    LibraryUserRepository libraryUserRepository;
 
     @Autowired
-    public LoanServiceImpl(LoanRepository loanRepository) {
+    public LoanServiceImpl(LoanRepository loanRepository, BookRepository bookRepository, LibraryUserRepository libraryUserRepository) {
         this.loanRepository = loanRepository;
+        this.bookRepository = bookRepository;
+        this.libraryUserRepository = libraryUserRepository;
     }
+
+    private LibraryUserServiceImpl libraryUserService;
+    private BookServiceImpl bookService;
+    private LoanServiceImpl loanService;
 
     /**
      * convert Loan to LoanDto
      * */
-    protected static LoanDto getLoanDto(Loan loan) {
+    protected LoanDto getLoanDto(Loan loan) {
         LoanDto loanDto = new LoanDto();
         loanDto.setLoanId(loan.getLoanId());
-        loanDto.setLoanTaker(LibraryUserServiceImpl.getLibraryUserDto(loan.getLoanTaker()));
-        loanDto.setBook(BookServiceImpl.getBookDto(loan.getBook()));
+        loanDto.setLoanTaker(libraryUserService.getLibraryUserDto(loan.getLoanTaker()));
+        loanDto.setBook(bookService.getBookDto(loan.getBook()));
         loanDto.setLoanDate(loan.getLoanDate());
         loanDto.setTerminated(loan.isTerminated());
         return loanDto;
     }
 
+
     /**
      * convert List<Loan> to List<LoanDto>
      * */
-    protected static List<LoanDto> getLoanDtos(List<Loan> foundItems) {
+    protected List<LoanDto> getLoanDtos(List<Loan> foundItems) {
         List<LoanDto> result = new ArrayList<>();
         for (Loan l : foundItems) {
             LoanDto loanDto = getLoanDto(l);
@@ -79,8 +92,8 @@ public class LoanServiceImpl implements LoanService {
     public LoanDto create(LoanDto loanDto) {
         if (loanRepository.existsById(loanDto.getLoanId()))
             throw new RuntimeException("Loan has already existed");
-        Loan loan = new Loan(LibraryUserServiceImpl.getLibraryUser(loanDto.getLoanTaker()),
-                BookServiceImpl.getBook(loanDto.getBook()),
+        Loan loan = new Loan(libraryUserService.getLibraryUser(loanDto.getLoanTaker()),
+                bookService.getBook(loanDto.getBook()),
                 loanDto.getLoanDate(),
                 loanDto.isTerminated());
 
@@ -92,10 +105,10 @@ public class LoanServiceImpl implements LoanService {
         if (!loanRepository.existsById(loanDto.getLoanId()))
             throw new RuntimeException("Loan does not exist");
         Loan loan = loanRepository.findById(loanDto.getLoanId()).get();
-        if (!loan.getLoanTaker().equals(LibraryUserServiceImpl.getLibraryUser(loanDto.getLoanTaker())))
-            loan.setLoanTaker(LibraryUserServiceImpl.getLibraryUser(loanDto.getLoanTaker()));
-        if (!loan.getBook().equals(BookServiceImpl.getBook(loanDto.getBook())))
-            loan.setBook(BookServiceImpl.getBook(loanDto.getBook()));
+        if (!loan.getLoanTaker().equals(libraryUserService.getLibraryUser(loanDto.getLoanTaker())))
+            loan.setLoanTaker(libraryUserService.getLibraryUser(loanDto.getLoanTaker()));
+        if (!loan.getBook().equals(bookService.getBook(loanDto.getBook())))
+            loan.setBook(bookService.getBook(loanDto.getBook()));
         if (loan.getLoanDate() != loanDto.getLoanDate())
             loan.setLoanDate(loanDto.getLoanDate());
         if (loan.isTerminated() != loanDto.isTerminated())

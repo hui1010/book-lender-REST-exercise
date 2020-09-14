@@ -2,6 +2,7 @@ package se.lexicon.huiyi.booklender.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import se.lexicon.huiyi.booklender.data.LibraryUserRepository;
 import se.lexicon.huiyi.booklender.dto.LibraryUserDto;
 import se.lexicon.huiyi.booklender.entity.LibraryUser;
@@ -22,8 +23,9 @@ public class LibraryUserServiceImpl implements LibraryUserService {
     /**
      * convert LibraryUser to LibraryUserDto
      * */
-    protected static LibraryUserDto getLibraryUserDto(LibraryUser libraryUser) {
+    protected LibraryUserDto getLibraryUserDto(LibraryUser libraryUser) {
         LibraryUserDto libraryUserDto = new LibraryUserDto();
+
         libraryUserDto.setUserId(libraryUser.getUserId());
         libraryUserDto.setRegDate(libraryUser.getRegDate());
         libraryUserDto.setName(libraryUser.getName());
@@ -34,7 +36,7 @@ public class LibraryUserServiceImpl implements LibraryUserService {
     /**
      * convert List<LibraryUser> to List<LibraryUserDto>
      * */
-    protected static List<LibraryUserDto> getLibraryUserDtos(List<LibraryUser> foundItems) {
+    protected List<LibraryUserDto> getLibraryUserDtos(List<LibraryUser> foundItems) {
         List<LibraryUserDto> results = new ArrayList<>();
         for (LibraryUser l : foundItems){
             LibraryUserDto libraryUserDto = getLibraryUserDto(l);
@@ -45,7 +47,7 @@ public class LibraryUserServiceImpl implements LibraryUserService {
     /**
      * convert LibraryUserDto to LibraryUser
      * */
-    protected static LibraryUser getLibraryUser(LibraryUserDto libraryUserDto){
+    protected LibraryUser getLibraryUser(LibraryUserDto libraryUserDto){
         LibraryUser libraryUser = new LibraryUser(
                 libraryUserDto.getRegDate(), libraryUserDto.getName(), libraryUserDto.getEmail()
         );
@@ -55,11 +57,16 @@ public class LibraryUserServiceImpl implements LibraryUserService {
 
     @Override
     public LibraryUserDto findById(int userId) {
-        LibraryUser libraryUser = libraryUserRepository.findById(userId).get();
+        if (!libraryUserRepository.existsById(userId))
+            throw new RuntimeException("Id " + userId + " does not exist");
+        LibraryUser libraryUser = libraryUserRepository.findByUserId(userId);
         return getLibraryUserDto(libraryUser);
     }
+
     @Override
     public LibraryUserDto findByEmail(String email) {
+        if (libraryUserRepository.findByEmailIgnoreCase(email) == null)
+            throw new RuntimeException("Did not find a library user with email: " + email);
         LibraryUser libraryUser = libraryUserRepository.findByEmailIgnoreCase(email);
         return getLibraryUserDto(libraryUser);
     }
@@ -72,6 +79,7 @@ public class LibraryUserServiceImpl implements LibraryUserService {
 
 
     @Override
+    @Transactional
     public LibraryUserDto create(LibraryUserDto libraryUserDto) {
         if (libraryUserRepository.existsById(libraryUserDto.getUserId()))
             throw new RuntimeException("Library user already exists");
@@ -80,6 +88,7 @@ public class LibraryUserServiceImpl implements LibraryUserService {
     }
 
     @Override
+    @Transactional
     public LibraryUserDto update(LibraryUserDto libraryUserDto) {
         if (!libraryUserRepository.existsById(libraryUserDto.getUserId()))
             throw new RuntimeException("Library user does not exist");
@@ -94,6 +103,7 @@ public class LibraryUserServiceImpl implements LibraryUserService {
     }
 
     @Override
+    @Transactional
     public boolean delete(int userId) {
         boolean deleted = false;
         if (libraryUserRepository.existsById(userId)){

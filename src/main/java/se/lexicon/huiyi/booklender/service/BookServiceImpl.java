@@ -23,7 +23,7 @@ public class BookServiceImpl implements BookService{
     /**
      * convert List<Book> to List<BookDto>
      * */
-    protected static List<BookDto> getBookDtos(List<Book> foundItems) {
+    protected List<BookDto> getBookDtos(List<Book> foundItems) {
         List<BookDto> result = new ArrayList<>();
         for (Book b : foundItems){
             BookDto bookDto = getBookDto(b);
@@ -34,7 +34,7 @@ public class BookServiceImpl implements BookService{
 /**
  * covert Book to BookDto
  * */
-    protected static BookDto getBookDto(Book book) {
+    protected BookDto getBookDto(Book book) {
         BookDto bookDto = new BookDto();
         bookDto.setBookId(book.getBookId());
         bookDto.setTitle(book.getTitle());
@@ -49,7 +49,7 @@ public class BookServiceImpl implements BookService{
     /**
      * convert BookDto to Book
      * */
-    protected static Book getBook(BookDto bookDto){
+    protected Book getBook(BookDto bookDto){
         Book book = new Book(bookDto.getTitle(), bookDto.getMaxLoanDays(), bookDto.getFinePerDay(), bookDto.getDescription());
         return book;
     }
