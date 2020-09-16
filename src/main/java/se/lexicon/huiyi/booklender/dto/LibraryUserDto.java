@@ -9,6 +9,16 @@ public class LibraryUserDto {
     private String name;
     private String email;
 
+    public LibraryUserDto() {
+    }
+
+    public LibraryUserDto(int userId, LocalDate regDate, String name, String email) {
+        this.userId = userId;
+        RegDate = regDate;
+        this.name = name;
+        this.email = email;
+    }
+
     public int getUserId() {
         return userId;
     }

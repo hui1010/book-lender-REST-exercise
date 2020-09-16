@@ -2,6 +2,10 @@ package se.lexicon.huiyi.booklender.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import se.lexicon.huiyi.booklender.data.BookRepository;
@@ -18,13 +22,19 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 @DataJpaTest
 class LoanServiceImplTest {
 
     LoanServiceImpl testObject;
     LibraryUserServiceImpl libraryUserService;
     BookServiceImpl bookService;
+
+    @Autowired
+    LoanRepository loanRepository;
+    @Autowired
+    BookRepository bookRepository;
+    @Autowired
+    LibraryUserRepository libraryUserRepository;
 
     Loan loan1;
     Loan loan2;
@@ -44,16 +54,10 @@ class LoanServiceImplTest {
     LibraryUserDto userDto1;
     LibraryUserDto userDto2;
 
-    @Autowired
-    LoanRepository loanRepository;
-    @Autowired
-    BookRepository bookRepository;
-    @Autowired
-    LibraryUserRepository libraryUserRepository;
 
     @BeforeEach
     void setUp() {
-        testObject = new LoanServiceImpl(loanRepository, libraryUserService, bookService);
+        testObject = new LoanServiceImpl(loanRepository, libraryUserRepository, bookRepository);
         bookService = new BookServiceImpl(bookRepository);
         libraryUserService = new LibraryUserServiceImpl(libraryUserRepository);
 
@@ -101,41 +105,94 @@ class LoanServiceImplTest {
 
     @Test
     void findById() {
-
+        assertEquals(loanDto1, testObject.findById(loanDto1.getLoanId()));
+        assertEquals(loanDto2, testObject.findById(loanDto2.getLoanId()));
     }
 
     @Test
     void findByBookId() {
 
+        assertEquals(1, testObject.findByBookId(bookDto1.getBookId()).size());
+        assertTrue(testObject.findByBookId(bookDto1.getBookId()).contains(loanDto1));
+        assertFalse(testObject.findByBookId(bookDto1.getBookId()).contains(loanDto2));
+
+        assertEquals(1, testObject.findByBookId(bookDto2.getBookId()).size());
+        assertTrue(testObject.findByBookId(bookDto2.getBookId()).contains(loanDto2));
+        assertFalse(testObject.findByBookId(bookDto2.getBookId()).contains(loanDto1));
     }
 
     @Test
     void findByUserId() {
+
+        assertEquals(1, testObject.findByUserId(loanDto1.getLoanTaker().getUserId()).size());
+        assertTrue(testObject.findByUserId(loanDto1.getLoanTaker().getUserId()).contains(loanDto1));
+        assertFalse(testObject.findByUserId(loanDto1.getLoanTaker().getUserId()).contains(loanDto2));
+
+        assertEquals(1, testObject.findByUserId(loanDto2.getLoanTaker().getUserId()).size());
+        assertTrue(testObject.findByUserId(loanDto2.getLoanTaker().getUserId()).contains(loanDto2));
+        assertFalse(testObject.findByUserId(loanDto2.getLoanTaker().getUserId()).contains(loanDto1));
 
     }
 
     @Test
     void findByIsTerminated() {
 
+        assertEquals(2, testObject.findByIsTerminated(false).size());
+
+        loan1.setTerminated(true);
+        loanDto1 = testObject.getLoanDto(loan1);
+        assertEquals(1, testObject.findByIsTerminated(false).size());
+        assertTrue(testObject.findByIsTerminated(false).contains(loanDto2));
+        assertFalse(testObject.findByIsTerminated(false).contains(loanDto1));
+
+        assertEquals(1, testObject.findByIsTerminated(true).size());
+        assertTrue(testObject.findByIsTerminated(true).contains(loanDto1));
+        assertFalse(testObject.findByIsTerminated(true).contains(loanDto2));
+
     }
 
     @Test
     void findAll() {
 
+        assertEquals(2, testObject.findAll().size());
     }
 
     @Test
     void create() {
 
+        LoanDto loanDto3 = new LoanDto();
+        loanDto3.setLoanTaker(userDto1);
+        loanDto3.setBook(bookDto2);
+        loanDto3.setLoanDate(LocalDate.of(2019,1,1));
+        loanDto3.setTerminated(true);
+
+        loanDto3 = testObject.create(loanDto3);
+
+        assertEquals(3, testObject.findAll().size());
+        assertTrue(testObject.findAll().contains(loanDto3));
+
     }
 
     @Test
     void update() {
+        loanDto2.setLoanDate(LocalDate.of(2030,1,1));
+        loanDto2 = testObject.update(loanDto2);
+        assertEquals(LocalDate.of(2030,1,1), loanDto2.getLoanDate());
 
+        loanDto1.setBook(testObject.getBookDto(book2));
+        loanDto1 = testObject.update(loanDto1);
+        assertEquals(bookDto2, loanDto1.getBook());
+
+        loanDto2.setLoanTaker(userDto1);
+        loanDto2 = testObject.update(loanDto2);
+        assertEquals(userDto1, loanDto2.getLoanTaker());
     }
 
     @Test
     void delete() {
+        testObject.delete(loanDto1.getBook().getBookId());
+        assertEquals(1, testObject.findAll().size());
+        assertFalse(testObject.findAll().contains(loanDto1));
 
     }
 }

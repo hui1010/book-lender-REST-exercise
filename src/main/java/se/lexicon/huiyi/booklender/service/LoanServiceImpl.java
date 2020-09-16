@@ -1,28 +1,37 @@
 package se.lexicon.huiyi.booklender.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import se.lexicon.huiyi.booklender.data.BookRepository;
+import se.lexicon.huiyi.booklender.data.LibraryUserRepository;
 import se.lexicon.huiyi.booklender.data.LoanRepository;
+import se.lexicon.huiyi.booklender.dto.BookDto;
+import se.lexicon.huiyi.booklender.dto.LibraryUserDto;
 import se.lexicon.huiyi.booklender.dto.LoanDto;
+import se.lexicon.huiyi.booklender.entity.Book;
+import se.lexicon.huiyi.booklender.entity.LibraryUser;
 import se.lexicon.huiyi.booklender.entity.Loan;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Configurable
 public class LoanServiceImpl implements LoanService {
 
     LoanRepository loanRepository;
-    private final LibraryUserServiceImpl libraryUserService;
-    private final BookServiceImpl bookService;
+    LibraryUserRepository libraryUserRepository;
+    BookRepository bookRepository;
 
     @Autowired
-    public LoanServiceImpl(LoanRepository loanRepository, LibraryUserServiceImpl libraryUserService, BookServiceImpl bookService) {
+    public LoanServiceImpl(LoanRepository loanRepository, LibraryUserRepository libraryUserRepository, BookRepository bookRepository) {
         this.loanRepository = loanRepository;
-
-        this.libraryUserService = libraryUserService;
-        this.bookService = bookService;
+        this.libraryUserRepository = libraryUserRepository;
+        this.bookRepository = bookRepository;
     }
+
 
     /**
      * convert Loan to LoanDto
@@ -30,8 +39,8 @@ public class LoanServiceImpl implements LoanService {
     protected LoanDto getLoanDto(Loan loan) {
         LoanDto loanDto = new LoanDto();
         loanDto.setLoanId(loan.getLoanId());
-        loanDto.setLoanTaker(libraryUserService.getLibraryUserDto(loan.getLoanTaker()));
-        loanDto.setBook(bookService.getBookDto(loan.getBook()));
+        loanDto.setLoanTaker(getLibraryUserDto(loan.getLoanTaker()));
+        loanDto.setBook(getBookDto(loan.getBook()));
         loanDto.setLoanDate(loan.getLoanDate());
         loanDto.setTerminated(loan.isTerminated());
         return loanDto;
@@ -50,6 +59,58 @@ public class LoanServiceImpl implements LoanService {
         return result;
     }
 
+
+    public BookDto getBookDto(Book book) {
+        BookDto bookDto = new BookDto();
+        bookDto.setBookId(book.getBookId());
+        bookDto.setTitle(book.getTitle());
+        bookDto.setAvailable(book.isAvailable());
+        bookDto.setReserved(book.isReserved());
+        bookDto.setMaxLoanDays(book.getMaxLoanDays());
+        bookDto.setFinePerDay(book.getFinePerDay());
+        bookDto.setDescription(book.getDescription());
+        return bookDto;
+    }
+
+    public LibraryUserDto getLibraryUserDto(LibraryUser libraryUser) {
+        LibraryUserDto libraryUserDto = new LibraryUserDto();
+        libraryUserDto.setUserId(libraryUser.getUserId());
+        libraryUserDto.setRegDate(libraryUser.getRegDate());
+        libraryUserDto.setName(libraryUser.getName());
+        libraryUserDto.setEmail(libraryUser.getEmail());
+        return libraryUserDto;
+    }
+
+    @Transactional
+    public LibraryUser getLibraryUser(LibraryUserDto libraryUserDto){
+        LibraryUser libraryUser = libraryUserRepository.findByUserId(libraryUserDto.getUserId());
+
+        return libraryUser;
+    }
+
+    @Transactional
+    public Book getBook(BookDto bookDto){
+        Book book = bookRepository.findById(bookDto.getBookId()).orElseThrow(()-> new IllegalArgumentException("Book does not exist"));
+        return book;
+    }
+
+    public List<BookDto> getBookDtos(List<Book> foundItems) {
+        List<BookDto> result = new ArrayList<>();
+        for (Book b : foundItems){
+            BookDto bookDto = getBookDto(b);
+            result.add(bookDto);
+        }
+        return result;
+    }
+
+    public List<LibraryUserDto> getLibraryUserDtos(List<LibraryUser> foundItems) {
+        List<LibraryUserDto> results = new ArrayList<>();
+        for (LibraryUser l : foundItems){
+            LibraryUserDto libraryUserDto = getLibraryUserDto(l);
+            results.add(libraryUserDto);
+        } return results;
+    }
+
     @Override
     public LoanDto findById(long loanId) {
         Loan loan = loanRepository.findById(loanId).get();
@@ -57,7 +118,7 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public List<LoanDto> FindByBookId(int bookId) {
+    public List<LoanDto> findByBookId(int bookId) {
         List<Loan> foundItems = loanRepository.findAllByBook_BookId(bookId);
         return getLoanDtos(foundItems);
     }
@@ -84,9 +145,9 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public LoanDto create(LoanDto loanDto) {
         if (loanRepository.existsById(loanDto.getLoanId()))
-            throw new RuntimeException("Loan has already existed");
-        Loan loan = new Loan(libraryUserService.getLibraryUser(loanDto.getLoanTaker()),
-                bookService.getBook(loanDto.getBook()),
+            throw new RuntimeException("Loan already existed");
+        Loan loan = new Loan(getLibraryUser(loanDto.getLoanTaker()),
+                getBook(loanDto.getBook()),
                 loanDto.getLoanDate(),
                 loanDto.isTerminated());
 
@@ -98,10 +159,10 @@ public class LoanServiceImpl implements LoanService {
         if (!loanRepository.existsById(loanDto.getLoanId()))
             throw new RuntimeException("Loan does not exist");
         Loan loan = loanRepository.findById(loanDto.getLoanId()).get();
-        if (!loan.getLoanTaker().equals(libraryUserService.getLibraryUser(loanDto.getLoanTaker())))
-            loan.setLoanTaker(libraryUserService.getLibraryUser(loanDto.getLoanTaker()));
-        if (!loan.getBook().equals(bookService.getBook(loanDto.getBook())))
-            loan.setBook(bookService.getBook(loanDto.getBook()));
+        if (!loan.getLoanTaker().equals(getLibraryUser(loanDto.getLoanTaker())))
+            loan.setLoanTaker(getLibraryUser(loanDto.getLoanTaker()));
+        if (!loan.getBook().equals(getBook(loanDto.getBook())))
+            loan.setBook(getBook(loanDto.getBook()));
         if (loan.getLoanDate() != loanDto.getLoanDate())
             loan.setLoanDate(loanDto.getLoanDate());
         if (loan.isTerminated() != loanDto.isTerminated())

@@ -1,6 +1,7 @@
 package se.lexicon.huiyi.booklender.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.lexicon.huiyi.booklender.data.LibraryUserRepository;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Configurable
 public class LibraryUserServiceImpl implements LibraryUserService {
 
     LibraryUserRepository libraryUserRepository;
@@ -25,7 +27,6 @@ public class LibraryUserServiceImpl implements LibraryUserService {
      * */
     protected LibraryUserDto getLibraryUserDto(LibraryUser libraryUser) {
         LibraryUserDto libraryUserDto = new LibraryUserDto();
-
         libraryUserDto.setUserId(libraryUser.getUserId());
         libraryUserDto.setRegDate(libraryUser.getRegDate());
         libraryUserDto.setName(libraryUser.getName());

@@ -1,6 +1,7 @@
 package se.lexicon.huiyi.booklender.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 import se.lexicon.huiyi.booklender.data.BookRepository;
 import se.lexicon.huiyi.booklender.dto.BookDto;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Configurable
 public class BookServiceImpl implements BookService{
 
     BookRepository bookRepository;
@@ -35,15 +37,8 @@ public class BookServiceImpl implements BookService{
  * covert Book to BookDto
  * */
     protected BookDto getBookDto(Book book) {
-        BookDto bookDto = new BookDto();
-        bookDto.setBookId(book.getBookId());
-        bookDto.setTitle(book.getTitle());
-        bookDto.setAvailable(book.isAvailable());
-        bookDto.setReserved(book.isReserved());
-        bookDto.setMaxLoanDays(book.getMaxLoanDays());
-        bookDto.setFinePerDay(book.getFinePerDay());
-        bookDto.setDescription(book.getDescription());
-        return bookDto;
+        return new BookDto(book.getBookId(), book.getTitle(), book.isAvailable(), book.isReserved(), book.getMaxLoanDays(),
+                book.getFinePerDay(), book.getDescription());
     }
 
     /**

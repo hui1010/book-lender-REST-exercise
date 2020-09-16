@@ -109,6 +109,7 @@ class BookServiceImplTest {
         assertEquals(3, testObject.findAll().size());
         assertTrue(testObject.findAll().contains(bookDto3));
         assertEquals(3, bookDto3.getBookId());
+        assertTrue(testObject.findAll().contains(bookDto3));
 
     }
 
