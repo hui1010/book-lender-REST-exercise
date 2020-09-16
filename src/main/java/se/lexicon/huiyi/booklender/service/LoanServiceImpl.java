@@ -2,12 +2,8 @@ package se.lexicon.huiyi.booklender.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import se.lexicon.huiyi.booklender.data.BookRepository;
-import se.lexicon.huiyi.booklender.data.LibraryUserRepository;
 import se.lexicon.huiyi.booklender.data.LoanRepository;
-import se.lexicon.huiyi.booklender.dto.LibraryUserDto;
 import se.lexicon.huiyi.booklender.dto.LoanDto;
-import se.lexicon.huiyi.booklender.entity.LibraryUser;
 import se.lexicon.huiyi.booklender.entity.Loan;
 
 import java.util.ArrayList;
@@ -17,19 +13,16 @@ import java.util.List;
 public class LoanServiceImpl implements LoanService {
 
     LoanRepository loanRepository;
-    BookRepository bookRepository;
-    LibraryUserRepository libraryUserRepository;
+    private final LibraryUserServiceImpl libraryUserService;
+    private final BookServiceImpl bookService;
 
     @Autowired
-    public LoanServiceImpl(LoanRepository loanRepository, BookRepository bookRepository, LibraryUserRepository libraryUserRepository) {
+    public LoanServiceImpl(LoanRepository loanRepository, LibraryUserServiceImpl libraryUserService, BookServiceImpl bookService) {
         this.loanRepository = loanRepository;
-        this.bookRepository = bookRepository;
-        this.libraryUserRepository = libraryUserRepository;
-    }
 
-    private LibraryUserServiceImpl libraryUserService;
-    private BookServiceImpl bookService;
-    private LoanServiceImpl loanService;
+        this.libraryUserService = libraryUserService;
+        this.bookService = bookService;
+    }
 
     /**
      * convert Loan to LoanDto
