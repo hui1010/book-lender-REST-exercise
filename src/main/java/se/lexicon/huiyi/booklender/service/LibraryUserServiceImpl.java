@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import se.lexicon.huiyi.booklender.data.LibraryUserRepository;
 import se.lexicon.huiyi.booklender.dto.LibraryUserDto;
 import se.lexicon.huiyi.booklender.entity.LibraryUser;
+import se.lexicon.huiyi.booklender.exception.ResourceNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,25 +50,25 @@ public class LibraryUserServiceImpl implements LibraryUserService {
      * convert LibraryUserDto to LibraryUser
      * */
     protected LibraryUser getLibraryUser(LibraryUserDto libraryUserDto){
-        LibraryUser libraryUser = new LibraryUser(
-                libraryUserDto.getRegDate(), libraryUserDto.getName(), libraryUserDto.getEmail()
-        );
-        return libraryUser;
+
+        return new LibraryUser(libraryUserDto.getRegDate(), libraryUserDto.getName(), libraryUserDto.getEmail());
     }
 
 
     @Override
     public LibraryUserDto findById(int userId) {
         if (!libraryUserRepository.existsById(userId))
-            throw new RuntimeException("Id " + userId + " does not exist");
+            throw new RuntimeException("Id does not exist");
         LibraryUser libraryUser = libraryUserRepository.findByUserId(userId);
         return getLibraryUserDto(libraryUser);
     }
 
     @Override
     public LibraryUserDto findByEmail(String email) {
+        if (email == null)
+            throw new IllegalArgumentException("Email should not be empty");
         if (libraryUserRepository.findByEmailIgnoreCase(email) == null)
-            throw new RuntimeException("Did not find a library user with email: " + email);
+            throw new ResourceNotFoundException("Did not find a library user with email: " + email);
         LibraryUser libraryUser = libraryUserRepository.findByEmailIgnoreCase(email);
         return getLibraryUserDto(libraryUser);
     }
@@ -83,7 +84,7 @@ public class LibraryUserServiceImpl implements LibraryUserService {
     @Transactional
     public LibraryUserDto create(LibraryUserDto libraryUserDto) {
         if (libraryUserRepository.existsById(libraryUserDto.getUserId()))
-            throw new RuntimeException("Library user already exists");
+            throw new RuntimeException("Library user already exists, please update");
         LibraryUser toCreate = new LibraryUser(libraryUserDto.getRegDate(), libraryUserDto.getName(), libraryUserDto.getEmail());
         return getLibraryUserDto(libraryUserRepository.save(toCreate));
     }
@@ -92,8 +93,10 @@ public class LibraryUserServiceImpl implements LibraryUserService {
     @Transactional
     public LibraryUserDto update(LibraryUserDto libraryUserDto) {
         if (!libraryUserRepository.existsById(libraryUserDto.getUserId()))
-            throw new RuntimeException("Library user does not exist");
-        LibraryUser user = libraryUserRepository.findById(libraryUserDto.getUserId()).get();
+            throw new RuntimeException("Library user does not exist, please create first");
+        LibraryUser user = libraryUserRepository.findById(libraryUserDto.getUserId()).orElseThrow(
+                () -> new ResourceNotFoundException("Cannot find the user.")
+        );
         if (user.getRegDate() != libraryUserDto.getRegDate())
             user.setRegDate(libraryUserDto.getRegDate());
         if (!user.getName().equals(libraryUserDto.getName()))
@@ -106,12 +109,12 @@ public class LibraryUserServiceImpl implements LibraryUserService {
     @Override
     @Transactional
     public boolean delete(int userId) {
+        if (!libraryUserRepository.findById(userId).isPresent())
+            throw new ResourceNotFoundException("Can not find the library user with id: " + userId);
         boolean deleted = false;
         if (libraryUserRepository.existsById(userId)){
             libraryUserRepository.delete(libraryUserRepository.findById(userId).get());
             deleted = true;
-        }else{
-            throw new RuntimeException("Library user does not exist");
         }
         return deleted;
     }

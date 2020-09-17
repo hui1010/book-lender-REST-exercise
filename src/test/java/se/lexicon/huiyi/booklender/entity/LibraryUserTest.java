@@ -51,13 +51,13 @@ class LibraryUserTest {
 
     @Test
     void getEmail() {
-        assertEquals("test@123.com", testObject.getEmail());
+        assertEquals("test@test.com", testObject.getEmail());
     }
 
     @Test
     void setEmail() {
-        testObject.setEmail("test@1234.com");
-        assertEquals("test@1234.com", testObject.getEmail());
+        testObject.setEmail("test@tester.com");
+        assertEquals("test@tester.com", testObject.getEmail());
     }
 
 }

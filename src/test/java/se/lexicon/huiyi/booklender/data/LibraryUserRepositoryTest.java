@@ -22,8 +22,8 @@ class LibraryUserRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        user1 = new LibraryUser(LocalDate.of(2020,1,1), "Tom", "tom@123.com");
-        user2 = new LibraryUser(LocalDate.of(2020,2,2), "Jerry", "jerry@123.com");
+        user1 = new LibraryUser(LocalDate.of(2020,1,1), "Tom", "tom@test.com");
+        user2 = new LibraryUser(LocalDate.of(2020,2,2), "Jerry", "jerry@test.com");
 
         libraryUserRepository.save(user1);
         libraryUserRepository.save(user2);
@@ -31,8 +31,8 @@ class LibraryUserRepositoryTest {
 
     @Test
     void findByEmailIgnoreCase() {
-        LibraryUser found1 = libraryUserRepository.findByEmailIgnoreCase("TOM@123.com");
-        LibraryUser found2 = libraryUserRepository.findByEmailIgnoreCase("jerry@123.com");
+        LibraryUser found1 = libraryUserRepository.findByEmailIgnoreCase("TOM@test.com");
+        LibraryUser found2 = libraryUserRepository.findByEmailIgnoreCase("jerry@test.com");
         LibraryUser found3 = libraryUserRepository.findByEmailIgnoreCase("dadada");
 
 

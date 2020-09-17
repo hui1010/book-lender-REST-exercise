@@ -13,6 +13,7 @@ import se.lexicon.huiyi.booklender.dto.LoanDto;
 import se.lexicon.huiyi.booklender.entity.Book;
 import se.lexicon.huiyi.booklender.entity.LibraryUser;
 import se.lexicon.huiyi.booklender.entity.Loan;
+import se.lexicon.huiyi.booklender.exception.ResourceNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class LoanServiceImpl implements LoanService {
         loanDto.setLoanTaker(getLibraryUserDto(loan.getLoanTaker()));
         loanDto.setBook(getBookDto(loan.getBook()));
         loanDto.setLoanDate(loan.getLoanDate());
-        loanDto.setTerminated(loan.isTerminated());
+        loanDto.setExpired(loan.isExpired());
         return loanDto;
     }
 
@@ -83,37 +84,20 @@ public class LoanServiceImpl implements LoanService {
 
     @Transactional
     public LibraryUser getLibraryUser(LibraryUserDto libraryUserDto){
-        LibraryUser libraryUser = libraryUserRepository.findByUserId(libraryUserDto.getUserId());
 
-        return libraryUser;
+        return libraryUserRepository.findByUserId(libraryUserDto.getUserId());
     }
 
     @Transactional
     public Book getBook(BookDto bookDto){
-        Book book = bookRepository.findById(bookDto.getBookId()).orElseThrow(()-> new IllegalArgumentException("Book does not exist"));
-        return book;
-    }
-
-    public List<BookDto> getBookDtos(List<Book> foundItems) {
-        List<BookDto> result = new ArrayList<>();
-        for (Book b : foundItems){
-            BookDto bookDto = getBookDto(b);
-            result.add(bookDto);
-        }
-        return result;
-    }
-
-    public List<LibraryUserDto> getLibraryUserDtos(List<LibraryUser> foundItems) {
-        List<LibraryUserDto> results = new ArrayList<>();
-        for (LibraryUser l : foundItems){
-            LibraryUserDto libraryUserDto = getLibraryUserDto(l);
-            results.add(libraryUserDto);
-        } return results;
+        return bookRepository.findById(bookDto.getBookId()).orElseThrow(()-> new IllegalArgumentException("Book does not exist"));
     }
 
     @Override
     public LoanDto findById(long loanId) {
-        Loan loan = loanRepository.findById(loanId).get();
+        Loan loan = loanRepository.findById(loanId).orElseThrow(()-> new ResourceNotFoundException(
+                "Cannot find the loan with id: " + loanId
+        ));
         return getLoanDto(loan);
     }
 
@@ -131,8 +115,8 @@ public class LoanServiceImpl implements LoanService {
 
 
     @Override
-    public List<LoanDto> findByIsTerminated(boolean terminated) {
-        List<Loan> foundItems = loanRepository.findAllByIsTerminated(terminated);
+    public List<LoanDto> findByExpired(boolean expired) {
+        List<Loan> foundItems = loanRepository.findAllByExpired(expired);
         return getLoanDtos(foundItems);
     }
 
@@ -143,21 +127,23 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
+    @Transactional
     public LoanDto create(LoanDto loanDto) {
         if (loanRepository.existsById(loanDto.getLoanId()))
-            throw new RuntimeException("Loan already existed");
+            throw new RuntimeException("Loan already existed, please update");
         Loan loan = new Loan(getLibraryUser(loanDto.getLoanTaker()),
                 getBook(loanDto.getBook()),
                 loanDto.getLoanDate(),
-                loanDto.isTerminated());
+                loanDto.isExpired());
 
         return getLoanDto(loanRepository.save(loan));
     }
 
     @Override
+    @Transactional
     public LoanDto update(LoanDto loanDto) {
         if (!loanRepository.existsById(loanDto.getLoanId()))
-            throw new RuntimeException("Loan does not exist");
+            throw new RuntimeException("Loan does not exist, please create first");
         Loan loan = loanRepository.findById(loanDto.getLoanId()).get();
         if (!loan.getLoanTaker().equals(getLibraryUser(loanDto.getLoanTaker())))
             loan.setLoanTaker(getLibraryUser(loanDto.getLoanTaker()));
@@ -165,21 +151,25 @@ public class LoanServiceImpl implements LoanService {
             loan.setBook(getBook(loanDto.getBook()));
         if (loan.getLoanDate() != loanDto.getLoanDate())
             loan.setLoanDate(loanDto.getLoanDate());
-        if (loan.isTerminated() != loanDto.isTerminated())
-            loan.setTerminated(loanDto.isTerminated());
+        if (loan.isOverdue() != loanDto.isExpired())
+            loan.setExpired(loanDto.isExpired());
 
         return getLoanDto(loanRepository.save(loan));
     }
 
     @Override
+    @Transactional
     public boolean delete(int bookId) {
         boolean deleted = false;
-        if (!loanRepository.findAllByBook_BookId(bookId).isEmpty()){
+
+        if (loanRepository.findAllByBook_BookId(bookId).isEmpty()){
+            throw new ResourceNotFoundException("Cannot find any loan with book id: " + bookId);
+        }else{
             List<Loan> foundItems = loanRepository.findAllByBook_BookId(bookId);
             for (Loan l : foundItems){
                 loanRepository.delete(l);
+                deleted = true;
             }
-            deleted = true;
         }
         return deleted;
     }

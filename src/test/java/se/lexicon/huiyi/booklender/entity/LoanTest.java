@@ -17,8 +17,8 @@ class LoanTest {
 
     @BeforeEach
     void setUp() {
-        loanTaker1 = new LibraryUser(LocalDate.of(2020,1,1), "Tom", "tom@123.com");
-        loanTaker2 = new LibraryUser(LocalDate.of(2020,2,2), "Jerry", "jerry@123.com");
+        loanTaker1 = new LibraryUser(LocalDate.of(2020,1,1), "Tom", "tom@test.com");
+        loanTaker2 = new LibraryUser(LocalDate.of(2020,2,2), "Jerry", "jerry@test.com");
         book1 = new Book("Book1", 30, BigDecimal.valueOf(10), "book one");
         book2 = new Book("Book2", 40, BigDecimal.valueOf(20), "book two");
         testObject = new Loan(loanTaker1, book1, LocalDate.of(2020,3,3), false);
@@ -35,7 +35,7 @@ class LoanTest {
 
     @Test
     void isOverdue() {
-        assertTrue(testObject.isOverdue());
+        assertTrue(testObject.isExpired());
     }
 
     @Test
@@ -88,13 +88,13 @@ class LoanTest {
     }
 
     @Test
-    void isTerminated() {
-        assertFalse(testObject.isTerminated());
+    void isExpired() {
+        assertFalse(testObject.isExpired());
     }
 
     @Test
-    void setTerminated() {
-        testObject.setTerminated(true);
-        assertTrue(testObject.isTerminated());
+    void setExpired() {
+        testObject.setExpired(true);
+        assertTrue(testObject.isExpired());
     }
 }

@@ -8,7 +8,7 @@ public interface LoanService {
     LoanDto findById(long loanId);
     List<LoanDto> findByBookId(int bookId);
     List<LoanDto> findByUserId(int userId);
-    List<LoanDto> findByIsTerminated(boolean terminated);
+    List<LoanDto> findByExpired(boolean expired);
     List<LoanDto> findAll();
     LoanDto create(LoanDto loanDto);
     LoanDto update(LoanDto loanDto);

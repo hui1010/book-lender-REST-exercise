@@ -1,12 +1,22 @@
 package se.lexicon.huiyi.booklender.dto;
 
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class LibraryUserDto {
+    public static final String EMAIL_PATTERN = "^\\w+@[a-zA-Z_]+?\\.[a-zA-Z]{2,3}$";
+    @Null(message = "User id should not be present.")
     private int userId;
+
+    @PastOrPresent(message = "The register date should not be in the future.")
     private LocalDate RegDate;
+
+    @NotBlank(message = "Name is needed.")
     private String name;
+
+    @NotBlank(message = "Email is needed.")
+    @Email(regexp = EMAIL_PATTERN)
     private String email;
 
     public LibraryUserDto() {

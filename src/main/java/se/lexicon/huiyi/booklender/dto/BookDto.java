@@ -1,16 +1,30 @@
 package se.lexicon.huiyi.booklender.dto;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.Objects;
 
 public class BookDto {
+    @Null(message = "Book id should not be present")
     private int bookId;
+    
+    @NotBlank(message = "Title is needed")
     private String title;
+
     private boolean available;
     private boolean reserved;
+
+    @PositiveOrZero
     private int maxLoanDays;
+    @PositiveOrZero
     private BigDecimal finePerDay;
+
+    @NotBlank(message = "Description is needed.")
     private String description;
+
 
     public BookDto() {
     }

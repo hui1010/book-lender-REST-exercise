@@ -30,11 +30,11 @@ class LibraryUserServiceImplTest {
     void setUp() {
         testObject = new LibraryUserServiceImpl(libraryUserRepository);
 
-        user1 = new LibraryUser(LocalDate.of(2020,1,1), "Tom", "tom@123.com");
+        user1 = new LibraryUser(LocalDate.of(2020,1,1), "Tom", "tom@test.com");
         libraryUserRepository.save(user1);
         userDto1 = testObject.getLibraryUserDto(user1);
 
-        user2 = new LibraryUser(LocalDate.of(2020,2,2), "Jerry", "jerry@123.com");
+        user2 = new LibraryUser(LocalDate.of(2020,2,2), "Jerry", "jerry@test.com");
         libraryUserRepository.save(user2);
         userDto2 = testObject.getLibraryUserDto(user2);
     }
@@ -56,8 +56,8 @@ class LibraryUserServiceImplTest {
 
     @Test
     void findByEmail() {
-        String email1 = "tOm@123.com";
-        String email2 = "jerry@123.com";
+        String email1 = "tOm@test.com";
+        String email2 = "jerry@test.com";
         assertEquals(userDto1, testObject.findByEmail(email1));
         assertEquals(userDto2, testObject.findByEmail(email2));
     }
@@ -74,24 +74,25 @@ class LibraryUserServiceImplTest {
         LibraryUserDto userDto3 = new LibraryUserDto();
         userDto3.setRegDate(LocalDate.of(2020,3,3));
         userDto3.setName("Bowser");
-        userDto3.setEmail("bowser@123.com");
+        userDto3.setEmail("bowser@test.com");
 
         userDto3 = testObject.create(userDto3);
 
         assertEquals(3, testObject.findAll().size());
         assertEquals(userDto3, testObject.findById(userDto3.getUserId()));
+        assertEquals("bowser@test.com", testObject.findById(userDto3.getUserId()).getEmail());
 
     }
 
     @Test
     void update() {
         userDto2.setName("Jessie");
-        userDto2.setEmail("jessie@123.com");
+        userDto2.setEmail("jessie@test.com");
         testObject.update(userDto2);
 
         assertEquals(userDto2, testObject.findById(userDto2.getUserId()));
         assertEquals("Jessie", testObject.findById(userDto2.getUserId()).getName());
-        assertEquals("jessie@123.com", testObject.findById(userDto2.getUserId()).getEmail());
+        assertEquals("jessie@test.com", testObject.findById(userDto2.getUserId()).getEmail());
     }
 
     @Test

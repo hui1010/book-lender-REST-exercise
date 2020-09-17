@@ -16,7 +16,7 @@ class LibraryUserDtoTest {
         testObject.setUserId(100);
         testObject.setRegDate(LocalDate.of(2020,1,1));
         testObject.setName("test");
-        testObject.setEmail("test@123.com");
+        testObject.setEmail("test@test.com");
     }
 
     @Test
@@ -59,12 +59,12 @@ class LibraryUserDtoTest {
 
     @Test
     void getEmail() {
-        assertEquals("test@123.com", testObject.getEmail());
+        assertEquals("test@test.com", testObject.getEmail());
     }
 
     @Test
     void setEmail() {
-        testObject.setEmail("test@1234.com");
-        assertEquals("test@1234.com", testObject.getEmail());
+        testObject.setEmail("test@tester.com");
+        assertEquals("test@tester.com", testObject.getEmail());
     }
 }

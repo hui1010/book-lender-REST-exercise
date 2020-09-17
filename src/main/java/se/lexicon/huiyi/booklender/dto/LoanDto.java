@@ -1,15 +1,26 @@
 package se.lexicon.huiyi.booklender.dto;
 
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class LoanDto {
+    @Null(message = "Loan id should not be present.")
     private long loanId;
+
+    @NotNull(message = "Loan must have a taker")
     private LibraryUserDto loanTaker;
+
+    @NotNull(message = "Loan must have a book.")
     private BookDto book;
+
+    @PastOrPresent(message = "Cannot make a loan for the future.")
     private LocalDate loanDate;
-    private boolean isTerminated;
+
+    private boolean expired;
 
     public LoanDto() {
     }
@@ -19,7 +30,7 @@ public class LoanDto {
         this.loanTaker = loanTaker;
         this.book = book;
         this.loanDate = loanDate;
-        this.isTerminated = isTerminated;
+        this.expired = isTerminated;
     }
 
     public long getLoanId() {
@@ -54,13 +65,14 @@ public class LoanDto {
         this.loanDate = loanDate;
     }
 
-    public boolean isTerminated() {
-        return isTerminated;
+    public boolean isExpired() {
+        return expired;
     }
 
-    public void setTerminated(boolean terminated) {
-        isTerminated = terminated;
+    public void setExpired(boolean expired) {
+        this.expired = expired;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -68,7 +80,7 @@ public class LoanDto {
         if (o == null || getClass() != o.getClass()) return false;
         LoanDto loanDto = (LoanDto) o;
         return loanId == loanDto.loanId &&
-                isTerminated == loanDto.isTerminated &&
+                expired == loanDto.expired &&
                 Objects.equals(loanTaker, loanDto.loanTaker) &&
                 Objects.equals(book, loanDto.book) &&
                 Objects.equals(loanDate, loanDto.loanDate);
@@ -76,7 +88,7 @@ public class LoanDto {
 
     @Override
     public int hashCode() {
-        return Objects.hash(loanId, loanTaker, book, loanDate, isTerminated);
+        return Objects.hash(loanId, loanTaker, book, loanDate, expired);
     }
 
     @Override
@@ -86,7 +98,7 @@ public class LoanDto {
                 ", loanTaker=" + loanTaker +
                 ", book=" + book +
                 ", loanDate=" + loanDate +
-                ", isTerminated=" + isTerminated +
+                ", expired=" + expired +
                 '}';
     }
 }

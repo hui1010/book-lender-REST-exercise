@@ -63,11 +63,12 @@ class BookServiceImplTest {
         assertEquals(2, testObject.findByAvailable(false).size());
         assertEquals(0, testObject.findByAvailable(true).size());
 
-        book2.setAvailable(true);
+        bookDto2.setAvailable(true);
+        bookDto2 = testObject.update(bookDto2);
         assertEquals(1, testObject.findByAvailable(true).size());
         assertEquals(1, testObject.findByAvailable(false).size());
-        assertTrue( testObject.findByAvailable(true).contains(testObject.getBookDto(book2)));
-        assertFalse( testObject.findByAvailable(true).contains(testObject.getBookDto(book1)));
+        assertTrue( testObject.findByAvailable(true).contains(bookDto2));
+        assertFalse( testObject.findByAvailable(true).contains(bookDto1));
     }
 
     @Test

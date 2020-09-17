@@ -2,7 +2,6 @@ package se.lexicon.huiyi.booklender.entity;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAmount;
 import java.util.Objects;
 
 @Entity
@@ -20,7 +19,7 @@ public class Loan {
     private Book book;
 
     private LocalDate loanDate;
-    private boolean isTerminated;
+    private boolean expired;
 
     public Loan() {
     }
@@ -29,7 +28,7 @@ public class Loan {
         this.loanTaker = loanTaker;
         this.book = book;
         this.loanDate = loanDate;
-        this.isTerminated = isTerminated;
+        this.expired = isTerminated;
     }
 
     public boolean isOverdue(){
@@ -76,12 +75,12 @@ public class Loan {
         this.loanDate = loanDate;
     }
 
-    public boolean isTerminated() {
-        return isTerminated;
+    public boolean isExpired() {
+        return expired;
     }
 
-    public void setTerminated(boolean terminated) {
-        isTerminated = terminated;
+    public void setExpired(boolean expired) {
+        this.expired = expired;
     }
 
     @Override
@@ -90,7 +89,7 @@ public class Loan {
         if (o == null || getClass() != o.getClass()) return false;
         Loan loan = (Loan) o;
         return loanId == loan.loanId &&
-                isTerminated == loan.isTerminated &&
+                expired == loan.expired &&
                 Objects.equals(loanTaker, loan.loanTaker) &&
                 Objects.equals(book, loan.book) &&
                 Objects.equals(loanDate, loan.loanDate);
@@ -98,7 +97,7 @@ public class Loan {
 
     @Override
     public int hashCode() {
-        return Objects.hash(loanId, loanTaker, book, loanDate, isTerminated);
+        return Objects.hash(loanId, loanTaker, book, loanDate, expired);
     }
 
     @Override
@@ -108,7 +107,7 @@ public class Loan {
                 ", loanTaker=" + loanTaker +
                 ", book=" + book +
                 ", loanDate=" + loanDate +
-                ", isTerminated=" + isTerminated +
+                ", expired=" + expired +
                 '}';
     }
 }

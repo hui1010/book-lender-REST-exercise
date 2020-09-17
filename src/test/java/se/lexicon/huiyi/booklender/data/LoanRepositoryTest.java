@@ -33,8 +33,8 @@ class LoanRepositoryTest {
         book1 = new Book("The Big Book", 30, BigDecimal.valueOf(5), "A Cook Book");
         book2 = new Book("Another Big Book", 30, BigDecimal.valueOf(5), "A Cook Book");
 
-        user1 = new LibraryUser(LocalDate.of(2020,1,1), "Tom", "tom@123.com");
-        user3 = new LibraryUser(LocalDate.of(2020,2,2), "Jerry", "jerry@123.com");
+        user1 = new LibraryUser(LocalDate.of(2020,1,1), "Tom", "tom@test.com");
+        user3 = new LibraryUser(LocalDate.of(2020,2,2), "Jerry", "jerry@test.com");
 
         loan1 = new Loan(user1, book1, LocalDate.of(2020,1,1), true);
         loan2 = new Loan(user1, book2, LocalDate.of(2020,1,1), true );
@@ -77,8 +77,8 @@ class LoanRepositoryTest {
 
     @Test
     void findAllByIsTerminated() {
-        List<Loan> found1 = loanRepository.findAllByIsTerminated(true);
-        List<Loan> found2 = loanRepository.findAllByIsTerminated(false);
+        List<Loan> found1 = loanRepository.findAllByExpired(true);
+        List<Loan> found2 = loanRepository.findAllByExpired(false);
 
         assertNotNull(found1);
         assertNotNull(found2);

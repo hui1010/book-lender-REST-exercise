@@ -22,7 +22,7 @@ class LoanDtoTest {
         user.setUserId(100);
         user.setRegDate(LocalDate.of(2020,1,1));
         user.setName("Tom");
-        user.setEmail("tom@123.com");
+        user.setEmail("tom@test.com");
 
         book.setBookId(1000);
         book.setTitle("Book1");
@@ -36,7 +36,7 @@ class LoanDtoTest {
         testObject.setLoanTaker(user);
         testObject.setBook(book);
         testObject.setLoanDate(LocalDate.of(2020,1,1));
-        testObject.setTerminated(false);
+        testObject.setExpired(false);
 
     }
 
@@ -70,7 +70,7 @@ class LoanDtoTest {
 
     @Test
     void isTerminated() {
-        assertFalse(testObject.isTerminated());
+        assertFalse(testObject.isExpired());
     }
 
 }

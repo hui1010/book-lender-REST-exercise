@@ -2,10 +2,6 @@ package se.lexicon.huiyi.booklender.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import se.lexicon.huiyi.booklender.data.BookRepository;
@@ -69,11 +65,11 @@ class LoanServiceImplTest {
         book2 = bookRepository.save(book2);
         bookDto2 = bookService.getBookDto(book2);
 
-        user1 = new LibraryUser(LocalDate.of(2020,1,1), "Tom", "tom@123.com");
+        user1 = new LibraryUser(LocalDate.of(2020,1,1), "Tom", "tom@test.com");
         user1 = libraryUserRepository.save(user1);
         userDto1 = libraryUserService.getLibraryUserDto(user1);
 
-        user2 = new LibraryUser(LocalDate.of(2020,2,2), "Jerry", "jerry@123.com");
+        user2 = new LibraryUser(LocalDate.of(2020,2,2), "Jerry", "jerry@test.com");
         user2 = libraryUserRepository.save(user2);
         userDto2 = libraryUserService.getLibraryUserDto(user2);
 
@@ -81,7 +77,7 @@ class LoanServiceImplTest {
         loan1 = loanRepository.save(loan1);
         loanDto1 = testObject.getLoanDto(loan1);
 
-        loan2 = new Loan(user2, book2, LocalDate.of(2020,2,2), false);
+        loan2 = new Loan(user2, book2, LocalDate.of(2020,2,2), true);
         loan2 = loanRepository.save(loan2);
         loanDto2 = testObject.getLoanDto(loan2);
 
@@ -135,19 +131,19 @@ class LoanServiceImplTest {
     }
 
     @Test
-    void findByIsTerminated() {
+    void findByExpired() {
 
-        assertEquals(2, testObject.findByIsTerminated(false).size());
+        assertEquals(1, testObject.findByExpired(false).size());
 
-        loan1.setTerminated(true);
+        loan1.setExpired(true);
         loanDto1 = testObject.getLoanDto(loan1);
-        assertEquals(1, testObject.findByIsTerminated(false).size());
-        assertTrue(testObject.findByIsTerminated(false).contains(loanDto2));
-        assertFalse(testObject.findByIsTerminated(false).contains(loanDto1));
+        assertEquals(0, testObject.findByExpired(false).size());
+        assertFalse(testObject.findByExpired(false).contains(loanDto2));
+        assertFalse(testObject.findByExpired(false).contains(loanDto1));
 
-        assertEquals(1, testObject.findByIsTerminated(true).size());
-        assertTrue(testObject.findByIsTerminated(true).contains(loanDto1));
-        assertFalse(testObject.findByIsTerminated(true).contains(loanDto2));
+        assertEquals(2, testObject.findByExpired(true).size());
+        assertTrue(testObject.findByExpired(true).contains(loanDto1));
+        assertTrue(testObject.findByExpired(true).contains(loanDto2));
 
     }
 
@@ -164,7 +160,7 @@ class LoanServiceImplTest {
         loanDto3.setLoanTaker(userDto1);
         loanDto3.setBook(bookDto2);
         loanDto3.setLoanDate(LocalDate.of(2019,1,1));
-        loanDto3.setTerminated(true);
+        loanDto3.setExpired(true);
 
         loanDto3 = testObject.create(loanDto3);
 
@@ -175,9 +171,9 @@ class LoanServiceImplTest {
 
     @Test
     void update() {
-        loanDto2.setLoanDate(LocalDate.of(2030,1,1));
+        loanDto2.setLoanDate(LocalDate.of(2013,1,1));
         loanDto2 = testObject.update(loanDto2);
-        assertEquals(LocalDate.of(2030,1,1), loanDto2.getLoanDate());
+        assertEquals(LocalDate.of(2013,1,1), loanDto2.getLoanDate());
 
         loanDto1.setBook(testObject.getBookDto(book2));
         loanDto1 = testObject.update(loanDto1);

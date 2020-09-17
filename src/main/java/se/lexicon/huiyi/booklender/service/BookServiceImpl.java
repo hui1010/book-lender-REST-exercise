@@ -3,9 +3,11 @@ package se.lexicon.huiyi.booklender.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import se.lexicon.huiyi.booklender.data.BookRepository;
 import se.lexicon.huiyi.booklender.dto.BookDto;
 import se.lexicon.huiyi.booklender.entity.Book;
+import se.lexicon.huiyi.booklender.exception.ResourceNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,22 +56,24 @@ public class BookServiceImpl implements BookService{
         List<Book> foundItems = bookRepository.findAllByReserved(reserved);
         return getBookDtos(foundItems);
     }
+
     @Override
     public List<BookDto> findByAvailable(boolean available) {
         List<Book> foundItems = bookRepository.findAllByAvailable(available);
         return getBookDtos(foundItems);
     }
 
-
     @Override
     public List<BookDto> findByTitle(String title) {
+        if (title == null || title.equals(""))
+            throw new IllegalArgumentException("Title should not be empty.");
         List<Book> foundItems = bookRepository.findAllByTitleContainingIgnoreCase(title);
         return getBookDtos(foundItems);
     }
 
     @Override
     public BookDto findById(int bookId) {
-        Book book = bookRepository.findById(bookId).get();
+        Book book = bookRepository.findById(bookId).orElseThrow(()-> new ResourceNotFoundException("Cannot find book with the id: " + bookId));
         return getBookDto(book);
     }
 
@@ -80,19 +84,22 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
+    @Transactional
     public BookDto create(BookDto bookDto) {
         if (bookRepository.findById(bookDto.getBookId()).isPresent())
-            throw new RuntimeException("Book already exists");
+            throw new RuntimeException("Book already exists, please update");
         Book book = new Book(bookDto.getTitle(),bookDto.getMaxLoanDays(),bookDto.getFinePerDay(),bookDto.getDescription());
-
+        book.setAvailable(bookDto.isAvailable());
+        book.setReserved(bookDto.isReserved());
         return getBookDto(bookRepository.save(book));
     }
 
     @Override
+    @Transactional
     public BookDto update(BookDto bookDto) {
         Optional<Book> optionalBook = bookRepository.findById(bookDto.getBookId());
         if (!optionalBook.isPresent())
-            throw new RuntimeException("Book does not exist");
+            throw new RuntimeException("Book does not exist, please create first");
         Book toUpdated = optionalBook.get();
         if (!toUpdated.getTitle().equals( bookDto.getTitle()))
             toUpdated.setTitle(bookDto.getTitle());
@@ -111,15 +118,15 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
+    @Transactional
     public boolean delete(int bookId) {
+        if (!bookRepository.findById(bookId).isPresent())
+            throw new ResourceNotFoundException("Book does not exist");
         boolean deleted = false;
         if (bookRepository.existsById(bookId)){
             bookRepository.delete(bookRepository.findById(bookId).get());
             deleted = true;
-        }else{
-            throw new RuntimeException("Book does not exist");
         }
-
         return deleted;
     }
 }
