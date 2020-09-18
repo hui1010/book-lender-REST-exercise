@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import se.lexicon.huiyi.booklender.dto.LoanDto;
 import se.lexicon.huiyi.booklender.service.LoanServiceImpl;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(path = "/api/loans")
 public class LoanControllerImpl implements LoanController {
@@ -45,9 +47,10 @@ public class LoanControllerImpl implements LoanController {
 
     @Override
     @PostMapping
-    public ResponseEntity<LoanDto> save(@RequestBody LoanDto loanDto) {
+    public ResponseEntity<LoanDto> save(@Valid @RequestBody LoanDto loanDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(loanService.create(loanDto));
     }
+
 
     @Override
     @PutMapping

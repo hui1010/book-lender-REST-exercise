@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import se.lexicon.huiyi.booklender.dto.LibraryUserDto;
 import se.lexicon.huiyi.booklender.service.LibraryUserService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -27,7 +28,7 @@ public class LibraryUserControllerImpl implements LibraryUserController{
 
     @Override
     @GetMapping(path = "/email/{userEmail}")
-    public ResponseEntity<LibraryUserDto> findByEmail(@PathVariable("userEmail") String email) {
+    public ResponseEntity<LibraryUserDto> findByEmail(@Valid @PathVariable("userEmail") String email) {
         return ResponseEntity.ok(libraryUserService.findByEmail(email));
     }
 
@@ -39,7 +40,7 @@ public class LibraryUserControllerImpl implements LibraryUserController{
 
     @Override
     @PostMapping
-    public ResponseEntity<LibraryUserDto> create(@RequestBody LibraryUserDto libraryUserDto) {
+    public ResponseEntity<LibraryUserDto> create(@Valid @RequestBody LibraryUserDto libraryUserDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(libraryUserService.create(libraryUserDto));
     }
 

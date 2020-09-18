@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import se.lexicon.huiyi.booklender.dto.BookDto;
 import se.lexicon.huiyi.booklender.service.BookServiceImpl;
 
+import javax.validation.Valid;
+
 
 @RestController
 @RequestMapping(path = "/api/books")
@@ -22,6 +24,7 @@ public class BookControllerImpl implements BookController{
     public BookControllerImpl(BookServiceImpl bookService) {
         this.bookService = bookService;
     }
+
 
     @Override
     @GetMapping(path = "/{bookId}")
@@ -47,14 +50,12 @@ public class BookControllerImpl implements BookController{
                 return ResponseEntity.ok(bookService.findAll());
             default:
                 throw new IllegalArgumentException("Not a valid type: " + type);
-
         }
-
     }
 
     @Override
     @PostMapping
-    public ResponseEntity<BookDto> save(@RequestBody BookDto bookDto) {
+    public ResponseEntity<BookDto> save(@Valid @RequestBody BookDto bookDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.create(bookDto));
     }
 

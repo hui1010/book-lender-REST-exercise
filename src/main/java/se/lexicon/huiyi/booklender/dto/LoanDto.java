@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class LoanDto {
     @Null(message = "Loan id should not be present.")
-    private long loanId;
+    private Long loanId;
 
     @NotNull(message = "Loan must have a taker")
     private LibraryUserDto loanTaker;
