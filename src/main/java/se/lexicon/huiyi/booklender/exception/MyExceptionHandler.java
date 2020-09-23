@@ -35,7 +35,7 @@ public class MyExceptionHandler extends ResponseEntityExceptionHandler {
         MyExceptionResponse response = new MyExceptionResponse(
                 LocalDateTime.now(),
                 HttpStatus.METHOD_NOT_ALLOWED.value(),
-                HttpStatus.MOVED_PERMANENTLY.name(),
+                HttpStatus.METHOD_NOT_ALLOWED.name(),
                 ex.getMessage(),
                 request.getDescription(false)
         );

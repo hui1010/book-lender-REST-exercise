@@ -31,19 +31,23 @@ public class Loan {
         this.expired = isTerminated;
     }
 
+
     public boolean isOverdue(){
-        boolean isOverdue = false;
-        if (LocalDate.now().isAfter(this.loanDate.plusDays(book.getMaxLoanDays())))
-            isOverdue = true;
-        return isOverdue;
+
+        return LocalDate.now().isAfter(loanDate.plusDays(book.getMaxLoanDays()));
     }
 
-    public boolean extendLoan(int days){
+    public boolean extendLoan(int days) throws RuntimeException{
         boolean isExtended = false;
-        if (!book.isReserved() && days == book.getMaxLoanDays()){
-            book.setMaxLoanDays(book.getMaxLoanDays() + days);
+        if (days > book.getMaxLoanDays()){
+            throw new RuntimeException("Cannot loan more than " + book.getMaxLoanDays() + " days.");
+        }
+
+        if (!(book.isReserved() || this.isOverdue())){
+            loanDate = LocalDate.now();
             isExtended = true;
         }
+
         return isExtended;
     }
 
