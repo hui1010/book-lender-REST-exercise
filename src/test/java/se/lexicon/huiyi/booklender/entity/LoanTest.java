@@ -42,7 +42,7 @@ class LoanTest {
     void extendLoan() {
         book1.setReserved(true);
         assertFalse(testObject.extendLoan(30));
-        //assertFalse(testObject.extendLoan(40));
+        assertFalse(testObject.extendLoan(40));
 
         book1.setReserved(false);
         testObject.setLoanDate(LocalDate.now());

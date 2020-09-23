@@ -21,6 +21,8 @@ public class Loan {
     private LocalDate loanDate;
     private boolean expired;
 
+    private LocalDate newLoanDate;
+
     public Loan() {
     }
 
@@ -29,23 +31,23 @@ public class Loan {
         this.book = book;
         this.loanDate = loanDate;
         this.expired = isTerminated;
+        setNewLoanDate(this.loanDate);
     }
 
 
     public boolean isOverdue(){
 
-        return LocalDate.now().isAfter(loanDate.plusDays(book.getMaxLoanDays()));
+        return LocalDate.now().isAfter(newLoanDate.plusDays(book.getMaxLoanDays()));
     }
 
     public boolean extendLoan(int days) throws RuntimeException{
         boolean isExtended = false;
-        if (days > book.getMaxLoanDays()){
-            throw new RuntimeException("Cannot loan more than " + book.getMaxLoanDays() + " days.");
-        }
-
-        if (!(book.isReserved() || this.isOverdue())){
-            loanDate = LocalDate.now();
-            isExtended = true;
+        if (days <= book.getMaxLoanDays()){
+            //throw new RuntimeException("Cannot loan more than " + book.getMaxLoanDays() + " days.");
+            if (!book.isReserved() && !isOverdue()){
+                newLoanDate = LocalDate.now();
+                isExtended = true;
+            }
         }
 
         return isExtended;
@@ -77,6 +79,7 @@ public class Loan {
 
     public void setLoanDate(LocalDate loanDate) {
         this.loanDate = loanDate;
+        setNewLoanDate(this.loanDate);
     }
 
     public boolean isExpired() {
@@ -85,6 +88,14 @@ public class Loan {
 
     public void setExpired(boolean expired) {
         this.expired = expired;
+    }
+
+    public LocalDate getNewLoanDate() {
+        return newLoanDate;
+    }
+
+    public void setNewLoanDate(LocalDate newLoanDate) {
+        this.newLoanDate = newLoanDate;
     }
 
     @Override
