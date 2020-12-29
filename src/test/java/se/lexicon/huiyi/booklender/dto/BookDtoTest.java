@@ -52,6 +52,7 @@ class BookDtoTest {
     @Test
     void isAvailable() {
         assertFalse(testObject.isAvailable());
+        assertFalse(testObject.equals(null));
     }
 
     @Test
